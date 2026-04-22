@@ -1,0 +1,33 @@
+# render.yaml — конфигурация Render.com
+# Автоматически создаёт: Web Service + PostgreSQL
+
+services:
+  # ---- Web Service (Node.js) ----
+  - type: web
+    name: misegesait
+    runtime: node
+    plan: free           # бесплатный тариф
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+
+    envVars:
+      # Render автоматически подставит DATABASE_URL при подключении базы
+      - key: DATABASE_URL
+        fromDatabase:
+          name: misegesait-db
+          property: connectionString
+
+      # Смените на случайную строку перед деплоем!
+      - key: JWT_SECRET
+        generateValue: true   # Render сгенерирует автоматически
+
+      - key: NODE_ENV
+        value: production
+
+# ---- PostgreSQL ----
+databases:
+  - name: misegesait-db
+    plan: free             # бесплатный тариф Render Postgres
+    databaseName: misegesait
+    user: misegesait_user

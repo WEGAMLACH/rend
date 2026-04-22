@@ -1,104 +1,171 @@
 # misegesait — R&DMESEGE
-
-Мессенджер на чистом HTML/CSS/JS (без бэкенда).
-Данные хранятся в `localStorage` браузера.
+### Деплой на Render.com + PostgreSQL
 
 ---
 
-## 📁 Структура файлов
+## 📁 Структура проекта
 
 ```
-misegesait/
-├── index.html   — главная страница (интерфейс)
-├── style.css    — стили (два стиля: modern и google)
-├── db.js        — слой данных (localStorage)
-├── script.js    — логика приложения
-└── README.md    — этот файл
+misegesait-render/
+├── server.js          — Node.js сервер (Express + WebSocket + PostgreSQL)
+├── package.json       — зависимости
+├── render.yaml        — конфигурация Render (IaC)
+├── .gitignore
+└── public/
+    ├── index.html     — SPA-интерфейс
+    ├── style.css      — стили (две темы)
+    └── script.js      — фронтенд (API + WebSocket)
 ```
 
 ---
 
-## 🚀 Загрузка на Sprinthost
+## 🚀 Деплой на Render.com — пошаговая инструкция
 
-### Шаг 1: Войти в панель управления
-Перейдите на https://sprinthost.ru → «Личный кабинет» → выберите ваш хостинг.
+### Шаг 1: Загрузить код на GitHub
 
-### Шаг 2: Открыть файловый менеджер
-В панели cPanel (или Sprinthost CP) найдите «Файловый менеджер» → войдите.
-
-### Шаг 3: Перейти в папку сайта
-Откройте папку `public_html` (или папку вашего домена/поддомена).
-
-### Шаг 4: Загрузить файлы
-Нажмите кнопку «Загрузить» (Upload) и загрузите все 4 файла:
-- `index.html`
-- `style.css`
-- `db.js`
-- `script.js`
-
-**Или через FTP:**
-- Хост: `ftp.ваш-домен.ru`
-- Логин/пароль: из письма Sprinthost
-- Подключитесь через FileZilla (бесплатно) и скопируйте файлы в `public_html/`
-
-### Шаг 5: Готово!
-Откройте ваш домен в браузере — сайт будет работать.
-
----
-
-## 💻 Локальный запуск для тестирования
-
-### Вариант 1 — Python (встроен в macOS/Linux):
 ```bash
-cd misegesait
-python3 -m http.server 8080
-# Открыть: http://localhost:8080
+# Инициализировать git-репозиторий
+cd misegesait-render
+git init
+git add .
+git commit -m "initial commit"
+
+# Создайте репозиторий на https://github.com/new (например: misegesait)
+git remote add origin https://github.com/ВАШ_ЛОГИН/misegesait.git
+git branch -M main
+git push -u origin main
 ```
 
-### Вариант 2 — Node.js:
+### Шаг 2: Зарегистрироваться на Render
+
+Перейдите на https://render.com и войдите через GitHub.
+
+### Шаг 3: Создать PostgreSQL базу данных
+
+1. Dashboard → **New +** → **PostgreSQL**
+2. Заполните:
+   - **Name:** `misegesait-db`
+   - **Database:** `misegesait`
+   - **User:** `misegesait_user`
+   - **Region:** Frankfurt (EU) или ближайший
+   - **Plan:** **Free**
+3. Нажмите **Create Database**
+4. Подождите ~1 мин, скопируйте **Internal Database URL** — понадобится на следующем шаге
+
+### Шаг 4: Создать Web Service
+
+1. Dashboard → **New +** → **Web Service**
+2. Подключите ваш GitHub-репозиторий
+3. Настройки:
+   - **Name:** `misegesait`
+   - **Runtime:** `Node`
+   - **Build Command:** `npm install`
+   - **Start Command:** `npm start`
+   - **Plan:** **Free**
+
+4. В разделе **Environment Variables** добавьте:
+
+   | Ключ | Значение |
+   |------|----------|
+   | `DATABASE_URL` | (Internal Database URL из Шага 3) |
+   | `JWT_SECRET` | любая длинная случайная строка |
+   | `NODE_ENV` | `production` |
+
+5. Нажмите **Create Web Service**
+
+### Шаг 5: Готово! 🎉
+
+Через 2–3 минуты сайт будет доступен по адресу:
+`https://misegesait.onrender.com`
+
+> ⚠️ **Бесплатный тариф Render:** сервис "засыпает" после 15 мин неактивности.
+> Первый запрос после сна занимает ~30 сек. Это нормально для бесплатного тарифа.
+
+---
+
+## ⚡ Альтернатива: автодеплой через render.yaml
+
+Если в корне репозитория есть `render.yaml`, Render может создать
+всё автоматически:
+
+1. Dashboard → **New +** → **Blueprint**
+2. Выберите репозиторий
+3. Render прочитает `render.yaml` и создаст и базу, и сервис
+
+---
+
+## 💻 Локальный запуск
+
+### 1. Установить зависимости
 ```bash
-npx serve misegesait
+npm install
+```
+
+### 2. Создать файл `.env`
+```env
+DATABASE_URL=postgresql://user:pass@localhost:5432/misegesait
+JWT_SECRET=my_local_secret_123
+PORT=3000
+```
+
+### 3. Локальный PostgreSQL (если нет — используйте Render DB)
+```bash
+# macOS
+brew install postgresql && brew services start postgresql
+createdb misegesait
+
+# Ubuntu
+sudo apt install postgresql
+sudo -u postgres createdb misegesait
+```
+
+Или используйте облачный Render Postgres бесплатно —
+просто скопируйте **External Database URL** в `.env`.
+
+### 4. Запуск
+```bash
+npm start
 # Открыть: http://localhost:3000
 ```
 
-### Вариант 3 — VS Code
-Установите расширение «Live Server» → ПКМ на `index.html` → «Open with Live Server».
+---
 
-> ⚠️ НЕ открывайте `index.html` напрямую двойным кликом (file:// протокол).
-> Некоторые браузеры ограничивают localStorage на file://. Используйте сервер.
+## 🔧 Переменные окружения
+
+| Переменная | Описание | Обязательна |
+|-----------|----------|-------------|
+| `DATABASE_URL` | Connection string PostgreSQL | ✅ |
+| `JWT_SECRET` | Секрет для подписи токенов | ✅ |
+| `PORT` | Порт сервера (Render ставит сам) | ❌ |
+| `NODE_ENV` | `production` / `development` | ❌ |
 
 ---
 
-## 🧪 Как протестировать
+## 📡 API Endpoints
 
-1. Откройте сайт в **двух разных вкладках** (или двух разных браузерах)
-2. В первой вкладке: зарегистрируйтесь как `user1`
-3. Во второй вкладке: зарегистрируйтесь как `user2`
-4. В первой вкладке: вкладка «Люди» → нажмите на `user2` → напишите сообщение
-5. Во второй вкладке: обновите страницу или подождите 1-2 сек — сообщение появится
-6. Проверьте переключение тем кнопкой ⬡
-
----
-
-## ⚙️ Особенности
-
-| Функция | Реализация |
-|---------|-----------|
-| Хранение данных | localStorage (браузер) |
-| Обновление в реальном времени | Опрос каждые 1.5 сек |
-| Пароль | Простой хэш (для demo) |
-| Темы | CSS-переменные, переключение без перезагрузки |
-| Адаптивность | Media query < 640px (мобильный вид) |
+| Метод | URL | Описание |
+|-------|-----|----------|
+| POST | `/api/register` | Регистрация |
+| POST | `/api/login` | Вход |
+| GET | `/api/users?q=` | Список пользователей |
+| GET | `/api/dialogs` | Мои диалоги |
+| GET | `/api/messages/:id` | История чата |
+| POST | `/api/messages` | Отправить сообщение |
+| WS | `wss://...` | Реальное время |
 
 ---
 
-## 🔒 Важно
+## 🛠️ Стек
 
-- Данные хранятся **только в браузере** пользователя (`localStorage`).
-- Это означает: пользователи на **разных устройствах** видят разных участников.
-- Для реального многопользовательского чата нужен бэкенд (PHP+MySQL).
-- Проект — полнофункциональное демо / прототип.
+| Компонент | Технология |
+|-----------|-----------|
+| Сервер | Node.js + Express |
+| База данных | PostgreSQL (Render Postgres) |
+| Реальное время | WebSocket (ws) |
+| Аутентификация | JWT + bcrypt |
+| Хостинг | Render.com (Free tier) |
+| Фронтенд | Vanilla JS + CSS |
 
 ---
 
-## 📬 R&DMESEGE · misegesait
+**R&DMESEGE · misegesait**
