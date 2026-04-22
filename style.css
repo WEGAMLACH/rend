@@ -1,0 +1,778 @@
+/* =====================================================
+   misegesait — R&DMESEGE
+   style.css — два стиля: modern (тёмный) и google (светлый)
+   ===================================================== */
+
+/* === СБРОС И БАЗОВЫЕ ПЕРЕМЕННЫЕ === */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ---- ТЕМА: MODERN (тёмная, индустриально-минималистичная) ---- */
+body.theme-modern {
+  --bg-primary:    #0d0f14;
+  --bg-secondary:  #13161e;
+  --bg-tertiary:   #1a1e2a;
+  --bg-hover:      #1f2334;
+  --bg-active:     #252a3a;
+  --accent:        #4f6ef7;
+  --accent-light:  #7a96ff;
+  --accent-dim:    rgba(79,110,247,0.15);
+  --text-primary:  #e8eaf2;
+  --text-secondary:#8b90a8;
+  --text-muted:    #555a72;
+  --border:        rgba(255,255,255,0.06);
+  --border-strong: rgba(255,255,255,0.12);
+  --msg-out-bg:    #2a3060;
+  --msg-out-text:  #dce3ff;
+  --msg-in-bg:     #1a1e2a;
+  --msg-in-text:   #e8eaf2;
+  --shadow:        0 8px 32px rgba(0,0,0,0.5);
+  --radius-sm:     6px;
+  --radius-md:     12px;
+  --radius-lg:     20px;
+  --font-main:     'DM Sans', sans-serif;
+  --font-mono:     'Space Mono', monospace;
+  --sidebar-w:     300px;
+  --transition:    0.18s ease;
+}
+
+/* ---- ТЕМА: GOOGLE (светлая, как Google Translate) ---- */
+body.theme-google {
+  --bg-primary:    #ffffff;
+  --bg-secondary:  #f8f9fa;
+  --bg-tertiary:   #f1f3f4;
+  --bg-hover:      #e8f0fe;
+  --bg-active:     #d2e3fc;
+  --accent:        #1a73e8;
+  --accent-light:  #4285f4;
+  --accent-dim:    rgba(26,115,232,0.10);
+  --text-primary:  #202124;
+  --text-secondary:#5f6368;
+  --text-muted:    #9aa0a6;
+  --border:        #dadce0;
+  --border-strong: #bdc1c6;
+  --msg-out-bg:    #1a73e8;
+  --msg-out-text:  #ffffff;
+  --msg-in-bg:     #f1f3f4;
+  --msg-in-text:   #202124;
+  --shadow:        0 2px 10px rgba(0,0,0,0.12);
+  --radius-sm:     4px;
+  --radius-md:     8px;
+  --radius-lg:     18px;
+  --font-main:     'DM Sans', sans-serif;
+  --font-mono:     'Space Mono', monospace;
+  --sidebar-w:     300px;
+  --transition:    0.18s ease;
+}
+
+/* === БАЗОВЫЕ СТИЛИ === */
+html, body {
+  height: 100%;
+  font-family: var(--font-main);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  transition: background var(--transition), color var(--transition);
+}
+
+/* === УТИЛИТЫ === */
+.hidden { display: none !important; }
+.screen { width: 100%; height: 100vh; }
+.screen.active { display: flex; }
+
+/* === AUTH SCREEN === */
+#auth-screen {
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Фоновая сетка только в modern теме */
+body.theme-modern #auth-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+body.theme-modern #auth-screen::after {
+  content: '';
+  position: absolute;
+  top: -200px; left: -200px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(79,110,247,0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.auth-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+  padding: 40px 32px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  animation: slideUp 0.4s ease both;
+}
+
+body.theme-google .auth-container {
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.auth-logo {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.logo-rd {
+  font-family: var(--font-mono);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -1px;
+}
+.logo-mesege {
+  font-family: var(--font-mono);
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--text-primary);
+  letter-spacing: -1px;
+}
+
+.auth-tagline {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Вкладки auth */
+.auth-tabs {
+  display: flex;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  margin-bottom: 24px;
+  gap: 2px;
+}
+.auth-tab {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-main);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: calc(var(--radius-md) - 2px);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.auth-tab.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Форма */
+.auth-form { display: flex; flex-direction: column; gap: 14px; }
+.auth-form.hidden { display: none; }
+
+.input-group { display: flex; flex-direction: column; gap: 5px; }
+.input-group label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.input-group input {
+  padding: 10px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 14px;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.input-group input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+.input-group input::placeholder { color: var(--text-muted); }
+
+.btn-primary {
+  margin-top: 4px;
+  padding: 11px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--transition), transform var(--transition);
+  letter-spacing: 0.02em;
+}
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:active { transform: scale(0.98); }
+
+.error-msg {
+  font-size: 12px;
+  color: #ff5c5c;
+  min-height: 16px;
+}
+
+/* Кнопка темы на auth */
+.theme-toggle-wrap {
+  text-align: center;
+  margin-top: 20px;
+}
+.theme-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-family: var(--font-main);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+.theme-icon { font-size: 14px; }
+
+/* === MAIN SCREEN === */
+#main-screen {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* === SIDEBAR === */
+.sidebar {
+  width: var(--sidebar-w);
+  min-width: var(--sidebar-w);
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform 0.3s ease;
+  z-index: 10;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: baseline;
+}
+.logo-rd-sm {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.logo-mes-sm {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+.sidebar-actions { display: flex; gap: 4px; }
+.icon-btn {
+  width: 34px; height: 34px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition);
+}
+.icon-btn:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-strong); }
+
+/* Поиск */
+.sidebar-search {
+  padding: 10px 12px;
+  flex-shrink: 0;
+}
+.sidebar-search input {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 13px;
+  outline: none;
+  transition: border-color var(--transition);
+}
+.sidebar-search input:focus { border-color: var(--accent); }
+.sidebar-search input::placeholder { color: var(--text-muted); }
+
+/* Вкладки sidebar */
+.sidebar-tabs {
+  display: flex;
+  padding: 0 12px 8px;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.stab {
+  flex: 1;
+  padding: 6px 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-main);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.stab.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.stab:hover:not(.active) { background: var(--bg-hover); }
+
+/* Список контактов */
+.contact-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 8px;
+}
+.contact-list::-webkit-scrollbar { width: 4px; }
+.contact-list::-webkit-scrollbar-track { background: transparent; }
+.contact-list::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition);
+  position: relative;
+}
+.contact-item:hover { background: var(--bg-hover); }
+.contact-item.active { background: var(--bg-active); }
+
+.contact-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+}
+
+.contact-info { flex: 1; overflow: hidden; }
+.contact-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.contact-preview {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.contact-meta { text-align: right; flex-shrink: 0; }
+.contact-time { font-size: 11px; color: var(--text-muted); }
+.unread-badge {
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  min-width: 18px; height: 18px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 99px;
+  padding: 0 4px;
+  margin-top: 3px;
+}
+
+/* Профиль внизу */
+.sidebar-footer {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.current-user-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: #fff;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+.current-user-info { overflow: hidden; }
+.current-user-info span { display: block; }
+.current-user-info span:first-child { font-size: 13px; font-weight: 500; }
+.username-tag { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); }
+
+/* === CHAT AREA === */
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Пустой экран */
+.chat-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 12px;
+  padding: 40px;
+}
+.empty-icon {
+  font-size: 48px;
+  color: var(--accent);
+  opacity: 0.5;
+  animation: pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+.chat-empty h2 {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  color: var(--text-secondary);
+}
+.chat-empty p { font-size: 13px; color: var(--text-muted); max-width: 260px; }
+
+/* Активный чат */
+#active-chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Шапка чата */
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+}
+.back-btn {
+  display: none; /* показываем только на мобиле */
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+.chat-header-avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: #fff;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+.chat-header-info { flex: 1; }
+.chat-header-info span:first-child {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+}
+.partner-status {
+  font-size: 12px;
+  color: #4caf78;
+}
+
+/* Сообщения */
+.messages-wrap {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+}
+.messages-wrap::-webkit-scrollbar { width: 4px; }
+.messages-wrap::-webkit-scrollbar-track { background: transparent; }
+.messages-wrap::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+#messages-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: auto;
+}
+
+/* Сообщение */
+.msg-row {
+  display: flex;
+  animation: msgIn 0.2s ease both;
+}
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.msg-row.out { justify-content: flex-end; }
+.msg-row.in  { justify-content: flex-start; }
+
+.msg-bubble {
+  max-width: 68%;
+  padding: 9px 14px;
+  border-radius: var(--radius-lg);
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: break-word;
+  position: relative;
+}
+.msg-row.out .msg-bubble {
+  background: var(--msg-out-bg);
+  color: var(--msg-out-text);
+  border-bottom-right-radius: 4px;
+}
+.msg-row.in .msg-bubble {
+  background: var(--msg-in-bg);
+  color: var(--msg-in-text);
+  border-bottom-left-radius: 4px;
+}
+
+/* В google-теме добавляем левую границу для входящих */
+body.theme-google .msg-row.in .msg-bubble {
+  border: 1px solid var(--border);
+}
+
+.msg-time {
+  font-size: 10px;
+  opacity: 0.55;
+  margin-top: 4px;
+  text-align: right;
+}
+
+/* Разделитель даты */
+.date-divider {
+  text-align: center;
+  margin: 12px 0 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.date-divider::before, .date-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Поле ввода */
+.input-area {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+}
+#msg-input {
+  flex: 1;
+  padding: 10px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 14px;
+  outline: none;
+  resize: none;
+  max-height: 140px;
+  overflow-y: auto;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  line-height: 1.5;
+}
+#msg-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+#msg-input::placeholder { color: var(--text-muted); }
+
+.send-btn {
+  width: 42px; height: 42px;
+  background: var(--accent);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: opacity var(--transition), transform var(--transition);
+}
+.send-btn:hover { opacity: 0.85; }
+.send-btn:active { transform: scale(0.93); }
+
+/* === TOAST === */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--bg-active);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  z-index: 9999;
+  white-space: nowrap;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* === ПУСТОЙ СПИСОК === */
+.empty-list {
+  padding: 24px 12px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* ===================================================
+   АДАПТИВНОСТЬ (мобильные)
+   =================================================== */
+@media (max-width: 640px) {
+  :root { --sidebar-w: 100vw; }
+
+  #main-screen { position: relative; }
+
+  .sidebar {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100vw;
+    z-index: 20;
+  }
+
+  .chat-area {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100%;
+    z-index: 15;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .chat-area.open {
+    transform: translateX(0);
+  }
+
+  .back-btn { display: block !important; }
+
+  .auth-container { margin: 16px; padding: 28px 20px; }
+
+  .msg-bubble { max-width: 85%; }
+}
+
+/* ===================================================
+   СПЕЦИФИЧНЫЕ СТИЛИ ДЛЯ GOOGLE-ТЕМЫ
+   =================================================== */
+body.theme-google .sidebar {
+  border-right: 2px solid #dadce0;
+}
+
+body.theme-google .chat-header {
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+body.theme-google .sidebar-brand .logo-rd-sm {
+  color: #1a73e8;
+}
+
+body.theme-google .auth-logo .logo-rd {
+  color: #1a73e8;
+}
+
+body.theme-google .contact-avatar {
+  background: #1a73e8;
+}
+
+body.theme-google .chat-header-avatar,
+body.theme-google .current-user-avatar {
+  background: #1a73e8;
+}
+
+/* Google-стиль: шрифт меню чуть крупнее */
+body.theme-google .contact-name { font-weight: 400; }
+body.theme-google .auth-tagline { color: #5f6368; }
+
+/* Плавные переходы при смене темы */
+body, .sidebar, .chat-area, .auth-container,
+.contact-item, .msg-bubble, .input-area,
+.chat-header, .sidebar-header {
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease;
+}

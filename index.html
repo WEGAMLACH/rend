@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>misegesait — R&DMESEGE</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+</head>
+<body class="theme-modern" id="app-body">
+
+  <!-- ===== AUTH SCREEN ===== -->
+  <div id="auth-screen" class="screen active">
+    <div class="auth-container">
+      <div class="auth-logo">
+        <span class="logo-rd">R&D</span><span class="logo-mesege">MESEGE</span>
+        <p class="auth-tagline">misegesait — общайся без лишнего</p>
+      </div>
+
+      <!-- Переключатель вкладок -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Войти</button>
+        <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Регистрация</button>
+      </div>
+
+      <!-- Форма входа -->
+      <div id="form-login" class="auth-form">
+        <div class="input-group">
+          <label>Логин</label>
+          <input type="text" id="login-username" placeholder="Ваш логин" autocomplete="username"/>
+        </div>
+        <div class="input-group">
+          <label>Пароль</label>
+          <input type="password" id="login-password" placeholder="Ваш пароль" autocomplete="current-password"/>
+        </div>
+        <div id="login-error" class="error-msg"></div>
+        <button class="btn-primary" onclick="doLogin()">Войти</button>
+      </div>
+
+      <!-- Форма регистрации -->
+      <div id="form-register" class="auth-form hidden">
+        <div class="input-group">
+          <label>Имя (отображаемое)</label>
+          <input type="text" id="reg-name" placeholder="Например: Иван" />
+        </div>
+        <div class="input-group">
+          <label>Логин</label>
+          <input type="text" id="reg-username" placeholder="Уникальный логин" autocomplete="username"/>
+        </div>
+        <div class="input-group">
+          <label>Пароль</label>
+          <input type="password" id="reg-password" placeholder="Минимум 4 символа" autocomplete="new-password"/>
+        </div>
+        <div id="reg-error" class="error-msg"></div>
+        <button class="btn-primary" onclick="doRegister()">Создать аккаунт</button>
+      </div>
+
+      <!-- Переключатель темы на экране авторизации -->
+      <div class="theme-toggle-wrap">
+        <button class="theme-btn" id="theme-toggle-auth" onclick="toggleTheme()">
+          <span class="theme-icon">⬡</span>
+          <span id="theme-label-auth">Google-стиль</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MAIN MESSENGER SCREEN ===== -->
+  <div id="main-screen" class="screen hidden">
+
+    <!-- SIDEBAR — список контактов/чатов -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <span class="logo-rd-sm">R&D</span><span class="logo-mes-sm">MSG</span>
+        </div>
+        <div class="sidebar-actions">
+          <button class="icon-btn" title="Переключить тему" onclick="toggleTheme()">⬡</button>
+          <button class="icon-btn" title="Выйти" onclick="doLogout()">⏻</button>
+        </div>
+      </div>
+
+      <!-- Поиск пользователей -->
+      <div class="sidebar-search">
+        <input type="text" id="user-search" placeholder="Найти пользователя…" oninput="searchUsers(this.value)" />
+      </div>
+
+      <!-- Вкладки: Чаты / Все пользователи -->
+      <div class="sidebar-tabs">
+        <button class="stab active" id="stab-chats" onclick="showSideTab('chats')">Чаты</button>
+        <button class="stab" id="stab-users" onclick="showSideTab('users')">Люди</button>
+      </div>
+
+      <!-- Список чатов -->
+      <div id="chats-list" class="contact-list"></div>
+      <!-- Список всех пользователей -->
+      <div id="users-list" class="contact-list hidden"></div>
+
+      <!-- Профиль текущего пользователя -->
+      <div class="sidebar-footer">
+        <div class="current-user-avatar" id="current-avatar"></div>
+        <div class="current-user-info">
+          <span id="current-display-name"></span>
+          <span id="current-username" class="username-tag"></span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CHAT AREA -->
+    <main class="chat-area" id="chat-area">
+      <!-- Экран-заглушка когда чат не выбран -->
+      <div class="chat-empty" id="chat-empty">
+        <div class="empty-icon">✦</div>
+        <h2>misegesait</h2>
+        <p>Выберите собеседника слева, чтобы начать разговор</p>
+      </div>
+
+      <!-- Активный чат -->
+      <div id="active-chat" class="hidden">
+        <!-- Шапка чата -->
+        <div class="chat-header">
+          <button class="back-btn" onclick="closeChat()">←</button>
+          <div class="chat-header-avatar" id="chat-partner-avatar"></div>
+          <div class="chat-header-info">
+            <span id="chat-partner-name"></span>
+            <span id="chat-partner-status" class="partner-status">в сети</span>
+          </div>
+        </div>
+
+        <!-- Сообщения -->
+        <div class="messages-wrap" id="messages-wrap">
+          <div id="messages-container"></div>
+        </div>
+
+        <!-- Поле ввода -->
+        <div class="input-area">
+          <textarea
+            id="msg-input"
+            placeholder="Напишите сообщение…"
+            rows="1"
+            onkeydown="handleMsgKey(event)"
+            oninput="autoResize(this)"
+          ></textarea>
+          <button class="send-btn" onclick="sendMessage()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </main>
+
+  </div><!-- /main-screen -->
+
+  <!-- Toast-уведомления -->
+  <div id="toast" class="toast"></div>
+
+  <script src="db.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
